@@ -232,53 +232,7 @@ void Settings_SSID_Or_Password(byte type)
   }
 }
 
-void Settings_Number_Of_Recipient()
-{
-  bool settingState = true;
-  int noOfRecipient = constrain(eep.numberOfRecipient, 1, 3);
-  byte counter = 0, btn = 0;
-
-  LCD_PrintStringAtCursor("Set number of   ", 0, 0);
-  LCD_PrintStringAtCursor("Recipient :     ", 0, 1);
-  do
-  {
-    btn = BUTTON;
-    switch (btn)
-    {
-      case BTN_MENU:
-        while (buttonPressed)
-          ;
-        settingState = false;
-        break;
-      case BTN_UP:
-        if (++noOfRecipient > 3)
-          noOfRecipient = 1;
-        break;
-      case BTN_DOWN:
-        if (--noOfRecipient < 1)
-          noOfRecipient = 3;
-        break;
-      case BTN_SET:
-        while (buttonPressed)
-          ;
-        EEPROM_Set_numberOfRecipient(noOfRecipient);
-        LCD_PrintStringAtCursor("Set done        ", 0, 0);
-        settingState = false;
-        delay(2000);
-        break;
-      default:
-        break;
-    }
-    lcd.setCursor(12, 1);
-    lcd.print(" ");
-    delay(100);
-    lcd.setCursor(12, 1);
-    lcd.print(noOfRecipient);
-    delay(250);
-  } while (settingState);
-}
-
-void Settings_Recipient(byte noOfRecipient)
+void Settings_Recipient()
 {
   bool settingState = true;
   char str[17];
@@ -289,12 +243,7 @@ void Settings_Recipient(byte noOfRecipient)
 
   EEPROM_Read_Data();
 
-  if (noOfRecipient == 0)
-    strcpy(str, eep.recipientGMail);
-  else if (noOfRecipient == 1)
-    strcpy(str, eep.recipientGMail_1);
-  else if (noOfRecipient == 2)
-    strcpy(str, eep.recipientGMail_2);
+  strcpy(str, eep.recipientGMail);
 
   lcd.clear();
   while (buttonPressed)
@@ -321,12 +270,7 @@ void Settings_Recipient(byte noOfRecipient)
         while (buttonPressed)
           ;
         lcd.clear();
-        if (noOfRecipient == 0)
-          LCD_PrintStringAtCursor("Set Recipient 1:", 0, 0);
-        else if (noOfRecipient == 1)
-          LCD_PrintStringAtCursor("Set Recipient 2:", 0, 0);
-        else if (noOfRecipient == 2)
-          LCD_PrintStringAtCursor("Set Recipient 3:", 0, 0);
+        LCD_PrintStringAtCursor("Set Recipient :", 0, 0);
         strcpy(str, " ");
       }
     }
@@ -358,7 +302,7 @@ void Settings_Recipient(byte noOfRecipient)
           {
             str[counter] = '\0';
 
-            EEPROM_Set_Recipient_GMail_Name(str, noOfRecipient);
+            EEPROM_Set_Recipient_GMail_Name(str);
 
             LCD_ClearAtRow(16, 0, 0);
             delay(500);

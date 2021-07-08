@@ -40,33 +40,11 @@ void EEPROM_Set_Password(char *password)
   delay(10);
 }
 
-void EEPROM_Set_numberOfRecipient(byte numberOfRecipient)
+void EEPROM_Set_Recipient_GMail_Name(char *gmailName)
 {
-  eep.numberOfRecipient = numberOfRecipient;
-  Serial.print("NoOfRecSet:");
-  Serial.println(numberOfRecipient);
-  EEPROM.put(0, eep);
-  EEPROM.commit();
-  delay(10);
-}
+  strcpy(eep.recipientGMail, gmailName);
+  Serial.print("RecipientSet:");
 
-void EEPROM_Set_Recipient_GMail_Name(char *gmailName, byte forNumberOfRecipient)
-{
-  if (forNumberOfRecipient == 0)
-  {
-    strcpy(eep.recipientGMail, gmailName);
-    Serial.print("Rec1Set:");
-  }
-  else if (forNumberOfRecipient == 1)
-  {
-    strcpy(eep.recipientGMail_1, gmailName);
-    Serial.print("Rec2Set:");
-  }
-  else if (forNumberOfRecipient == 2)
-  {
-    strcpy(eep.recipientGMail_2, gmailName);
-    Serial.print("Rec3Set:");
-  }
   Serial.println(gmailName);
   EEPROM.put(0, eep);
   EEPROM.commit();

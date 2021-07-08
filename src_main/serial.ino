@@ -8,7 +8,7 @@ enum DataReceiveList
 {
   Message_Id,
   Auto_Mode,
-  //  PH_Calib,
+  Email_1,
   RTC_Time,
   Minimum_ADC,
   Period_Morning_On,
@@ -51,7 +51,7 @@ void Serial_Event2()
 
 void Serial_SplitString()
 {
-  char receivedCharString[70];
+  char receivedCharString[130];
   char splitChar = ';';
   char character = ' ';
   uint8_t indexChar = 0;
@@ -60,10 +60,10 @@ void Serial_SplitString()
   uint8_t hour, minute, second;
 
   String commandMode = "";
-  receivedCharString[61] = '\n';
+  receivedCharString[126] = '\n';
   strcpy(receivedCharString, serialSetting.c_str());
   //  Serial.println(receivedCharString);
-  while (character != '\n' && indexChar < 60)
+  while (character != '\n' && indexChar < 125)
   {
     character = receivedCharString[indexChar];
     //    Serial.print(String() + indexChar + " " + character + " ");
@@ -102,22 +102,27 @@ void Serial_SplitString()
             //            Serial.println(eep.modeOperation);
           }
           else if (commandMode == SET_ACTUAL) {
-            if (stringData == "ON")
-              Setting_StatePump(ON);
-            else if (stringData == "OFF")
-              Setting_StatePump(OFF);
-            Serial_SendRefreshActual();
-            //              Serial.println("Set Actual Failed!");
+            if (!modeOperation) {
+              if (stringData == "ON")
+                Setting_StatePump(ON);
+              else if (stringData == "OFF")
+                Setting_StatePump(OFF);
+              Serial_SendRefreshActual();
+            }
             return;
           }
           break;
-        //        case PH_Calib:
-        //          if (commandMode == SET_SETTING)
-        //          {
-        //            if (stringData == "YES");
-        //            //              EEPROM_Set_PH_Adjust_Calib();
-        //          }
-        //          break;
+        case Email_1:
+          if (commandMode == SET_SETTING)
+          {
+            int str_len = stringData.length() + 1;
+            char char_array[str_len];
+            stringData.toCharArray(char_array, str_len);
+
+            Serial.print(char_array);
+            EEPROM_Set_Recipient_GMail_Name(char_array);
+          }
+          break;
         case RTC_Time:
           if (commandMode == SET_SETTING)
           {
@@ -206,6 +211,8 @@ void Serial_SendRefreshSetting() {
   strDataToSend = "ref1";
   strDataToSend += split;
   strDataToSend += modeOperation ? "ON" : "OFF";
+  strDataToSend += split;
+  strDataToSend += String() + eep.recipientGMail;
   strDataToSend += split;
   if (stringTime[2] == ' ')stringTime[2] == ':';
   strDataToSend += stringTime;

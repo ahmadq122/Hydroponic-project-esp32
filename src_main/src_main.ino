@@ -79,9 +79,6 @@ struct eeprom {
   char ssid[17];
   char password[17];
   char recipientGMail[17];
-  char recipientGMail_1[17];
-  char recipientGMail_2[17];
-  byte numberOfRecipient;
   byte modeOperation;
   float phLow[2];
   float phNom[2];
@@ -113,8 +110,8 @@ char ssid[17]           = "my12IPhone";
 char password[17]       = "password";
 char recipientGMail[17] = "ahmadqodri122";
 byte wifiConnection = 0xFF;
-
 bool wifiTimerCheckState = false;
+///////////////////////
 bool pumpState = false;
 bool timeState = MORNING;
 int phOfWater = 7;

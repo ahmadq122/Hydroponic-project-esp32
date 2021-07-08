@@ -1,54 +1,30 @@
 bool Email_Send_Notification() {
+  Serial.println("Email_Send_Notification()");
   if (systemSafe && counterTimerInterrupt2 > 0)
     counterTimerInterrupt2 = 0;
   if (!systemSafe && !counterTimerInterrupt2) {
     counterTimerInterrupt2 = 3600;
     if (wifiConnection) {
-      switch (eep.numberOfRecipient) {
-        case 1:
-          Email_SendStringNotifTo(eep.recipientGMail, "", "", 1);
-          Serial.println("Send Email to 1 Person");
-          break;
-        case 2:
-          Email_SendStringNotifTo(eep.recipientGMail, eep.recipientGMail_1, "", 2);
-          //          Email_SendStringNotifTo(eep.recipientGMail);
-          //          //          delay(1000);
-          //          Email_SendStringNotifTo(eep.recipientGMail_1);
-          Serial.println("Send Email to 2 Persons");
-          break;
-        case 3:
-          Email_SendStringNotifTo(eep.recipientGMail, eep.recipientGMail_1, eep.recipientGMail_2, 3);
-          //          Email_SendStringNotifTo(eep.recipientGMail);
-          //          //          delay(1000);
-          //          Email_SendStringNotifTo(eep.recipientGMail_1);
-          //          //          delay(1000);
-          //          Email_SendStringNotifTo(eep.recipientGMail_2);
-          Serial.println("Send Email to 3 Persons");
-          break;
-        default: break;
-      }
+      Email_SendStringNotifTo(eep.recipientGMail);
+      Serial.println("Send Email to 1 Person ");
+      Serial.println(eep.recipientGMail);
+
       return true;
     }
   }
   return false;
 }
 
-void Email_SendStringNotifTo(char * recipientGMailName1, char * recipientGMailName2, char * recipientGMailName3, byte noRecipient) {
+void Email_SendStringNotifTo(char * recipientGMailName) {
   char Str5[5];
-  char recipient_GMail1[27];
-  char recipient_GMail2[27];
-  char recipient_GMail3[27];
+  char recipient_GMail[27];
   // Send HTML email
   char body [150] = "<b>WARNING!!!</b><br>Water level is LOW,<br>ADC Minimum: ";
   char body1 [25]  = "<br>ADC Actual : ";
   char body2 [60]  = "<br><i>Thanks...</i>";
 
-  strcpy(recipient_GMail1, recipientGMailName1);
-  strcat(recipient_GMail1, "@gmail.com");
-  strcpy(recipient_GMail2, recipientGMailName2);
-  strcat(recipient_GMail2, "@gmail.com");
-  strcpy(recipient_GMail3, recipientGMailName3);
-  strcat(recipient_GMail3, "@gmail.com");
+  strcpy(recipient_GMail, recipientGMailName);
+  strcat(recipient_GMail, "@gmail.com");
 
   General_IntegerToString(eep.minimumWaterLevelADC, Str5, 4);
   strcat(body, Str5);
@@ -58,12 +34,7 @@ void Email_SendStringNotifTo(char * recipientGMailName1, char * recipientGMailNa
   strcat(body, body2);
   //  String result = sendEmail("Test", "ESP32", body, "survivingwithandroid@gmail.com", true);
   // Send plain email
-  if (noRecipient == 1)
-    Email_Send("ESP32-Notification", "ESP32-BOT", body, recipient_GMail1, true);
-  else if (noRecipient == 2)
-    Email_Send2("ESP32-Notification", "ESP32-BOT", body, recipient_GMail1, recipient_GMail2, true);
-  else if (noRecipient == 3)
-    Email_Send3("ESP32-Notification", "ESP32-BOT", body, recipient_GMail1, recipient_GMail2, recipient_GMail3, true);
+  Email_Send("ESP32-Notification", "ESP32-BOT", body, recipient_GMail, true);
 }
 
 String Email_Send(char *subject, char *sender, char *body, char *recipient, boolean htmlFormat) {

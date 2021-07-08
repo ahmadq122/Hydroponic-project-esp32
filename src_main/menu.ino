@@ -37,22 +37,7 @@ void Menu_Set_WIFI() {
 }
 
 void Menu_Set_GMAIL() {
-  byte recipient = constrain(eep.numberOfRecipient, 1, 3);
-  byte recip = 0;
-  String setGMAILMenu[4] {
-    "NO.OF RECIPIENT",
-    "SET RECIPIENT 1",
-    "SET RECIPIENT 2",
-    "SET RECIPIENT 3",
-  };
-  byte option = 0;
-  do {
-    option = Menu_GetSelectedMenu (setGMAILMenu, constrain(eep.numberOfRecipient, 1, 3) + 1, option);
-    if (option == 0) Settings_Number_Of_Recipient();
-    else if (option == 1)Settings_Recipient(0);
-    else if (option == 2)Settings_Recipient(1);
-    else if (option == 3)Settings_Recipient(2);
-  } while (option != MENU_EXIT);
+  Settings_Recipient();
 }
 
 
