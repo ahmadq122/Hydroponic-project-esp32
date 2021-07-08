@@ -6,7 +6,7 @@ bool Email_Send_Notification() {
     counterTimerInterrupt2 = 3600;
     if (wifiConnection) {
       Email_SendStringNotifTo(eep.recipientGMail);
-      Serial.println("Send Email to 1 Person ");
+      Serial.print("Send Email to ");
       Serial.println(eep.recipientGMail);
 
       return true;
@@ -21,7 +21,7 @@ void Email_SendStringNotifTo(char * recipientGMailName) {
   // Send HTML email
   char body [150] = "<b>WARNING!!!</b><br>Water level is LOW,<br>ADC Minimum: ";
   char body1 [25]  = "<br>ADC Actual : ";
-  char body2 [60]  = "<br><i>Thanks...</i>";
+  char body2 [60]  = "<br>pH of Water: ";
 
   strcpy(recipient_GMail, recipientGMailName);
   strcat(recipient_GMail, "@gmail.com");
@@ -30,6 +30,7 @@ void Email_SendStringNotifTo(char * recipientGMailName) {
   strcat(body, Str5);
   General_IntegerToString(ADC_GetWaterLevelValue(), Str5, 4);
   strcat(body1, Str5);
+  strcat(body2, (String() + phOfWater).c_str());
   strcat(body, body1);
   strcat(body, body2);
   //  String result = sendEmail("Test", "ESP32", body, "survivingwithandroid@gmail.com", true);
