@@ -116,3 +116,23 @@ void EEPROM_Set_Minimum_Water_Level_ADC(unsigned int minimumWaterLevelADC)
   EEPROM.commit();
   delay(10);
 }
+
+void EEPROM_Set_Maximum_Water_Level_ADC(unsigned int maximumWaterLevelADC)
+{
+  eep.maximumWaterLevelADC = maximumWaterLevelADC;
+  Serial.print("MaxADCSet:");
+  Serial.println(maximumWaterLevelADC);
+  EEPROM.put(0, eep);
+  EEPROM.commit();
+  delay(10);
+}
+
+void EEPROM_Set_Low_Water_Level_ADC(uint8_t lowWaterLevelADC)
+{
+  eep.lowWaterLevelADC = lowWaterLevelADC;
+  Serial.print("LowLevelSet:");
+  Serial.println(lowWaterLevelADC);
+  EEPROM.put(0, eep);
+  EEPROM.commit();
+  delay(10);
+}

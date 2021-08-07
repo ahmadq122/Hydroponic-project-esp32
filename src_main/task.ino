@@ -6,7 +6,7 @@ void Task_Setup() {
     ,  "Task_EvenEverySecond"   // A name just for humans
     ,  1024 * 4 // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
-    ,  6  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,  7  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
     ,  NULL
     ,  ARDUINO_RUNNING_CORE);
 
@@ -15,7 +15,7 @@ void Task_Setup() {
     ,  "Task_AdcRead1"
     ,  1024 * 4  // Stack size
     ,  NULL
-    ,  5  // Priority
+    ,  6  // Priority
     ,  NULL
     ,  ARDUINO_RUNNING_CORE);
 
@@ -24,7 +24,7 @@ void Task_Setup() {
     ,  "Task_AdcRead2"
     ,  1024 * 4  // Stack size
     ,  NULL
-    ,  4  // Priority
+    ,  5  // Priority
     ,  NULL
     ,  ARDUINO_RUNNING_CORE);
 
@@ -33,7 +33,7 @@ void Task_Setup() {
     ,  "Task_EvenSerialReceive"
     ,  1024 * 10 // Stack size
     ,  NULL
-    ,  3  // Priority
+    ,  4  // Priority
     ,  NULL
     ,  ARDUINO_RUNNING_CORE);
 
@@ -42,7 +42,7 @@ void Task_Setup() {
     ,  "Task_EvenSendEmail"
     ,  1024 * 20 // Stack size
     ,  NULL
-    ,  2  // Priority
+    ,  3  // Priority
     ,  NULL
     ,  ARDUINO_RUNNING_CORE);
 
@@ -51,10 +51,18 @@ void Task_Setup() {
     ,  "Task_EvenEvery5Seconds"   // A name just for humans
     ,  1024 * 10  // This stack size can be checked & adjusted by reading the Stack Highwater
     ,  NULL
-    ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
     ,  NULL
     ,  ARDUINO_RUNNING_CORE);
 
+  xTaskCreatePinnedToCore(
+    Task_EvenEvery300MiliSeconds
+    ,  "Task_EvenEvery300MiliSeconds"   // A name just for humans
+    ,  1024  // This stack size can be checked & adjusted by reading the Stack Highwater
+    ,  NULL
+    ,  1  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,  NULL
+    ,  ARDUINO_RUNNING_CORE);
   // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
 }
 
@@ -75,7 +83,8 @@ void Task_EvenEverySecond(void *pvParameters)  // This is a task.
     }
     blinkSeconds = !blinkSeconds;
     secondTriggered = true;
-
+    refreshTime = true;
+    //    Serial.println(String() + "secondTriggered" + secondTriggered);
     if (++counterTimerMinutes > 59) {
       counterTimerMinutes = 0;
       wifiCheckState = true;
@@ -165,6 +174,17 @@ void Task_EvenEvery5Seconds(void *pvParameters)  // This is a task.
   {
     if (!menuState && loopState)
       Serial_SendRefreshActual();
-    vTaskDelay(5000);
+    vTaskDelay(3000);
+  }
+}
+
+void Task_EvenEvery300MiliSeconds(void *pvParameters)  // This is a task.
+{
+  (void) pvParameters;
+  // initialize digital LED_BUILTIN on pin 13 as an output.
+  for (;;) // A Task shall never return or exit.
+  {
+    miliSecs300 = true;
+    vTaskDelay(300);
   }
 }

@@ -71,20 +71,23 @@ void Settings_WiFi()
         case BTN_DOWN:
           if (++i > n - 1)
             i = n - 1;
-          while (buttonPressed)
-            ;
+          while (buttonPressed) {
+            delay(50);
+          }
           LCD_ClearAtRow(16, 0, 1);
           break;
         case BTN_UP:
           if (--i <= 0)
             i = 0;
-          while (buttonPressed)
-            ;
+          while (buttonPressed) {
+            delay(50);
+          }
           LCD_ClearAtRow(16, 0, 1);
           break;
         case BTN_SET:
-          while (buttonPressed)
-            ;
+          while (buttonPressed) {
+            delay(50);
+          }
           available_SSID[i].toCharArray(ssidScanned, 17);
           EEPROM_Set_SSID(ssidScanned);
           LCD_PrintStringAtCursor(String() + "Netework Set : ", 0, 0);
@@ -92,8 +95,9 @@ void Settings_WiFi()
           setting = false;
           break;
         case BTN_MENU:
-          while (buttonPressed)
-            ;
+          while (buttonPressed) {
+            delay(50);
+          }
           break;
         default:
           break;
@@ -121,8 +125,9 @@ void Settings_SSID_Or_Password(byte type)
     strcpy(str, eep.password);
 
   lcd.clear();
-  while (buttonPressed)
-    ;
+  while (buttonPressed) {
+    delay(50);
+  }
   LCD_PrintStringAtCursor("SET to Change   ", 0, 0);
   LCD_PrintStringAtCursor(str, 0, 1);
   if (type)
@@ -154,8 +159,9 @@ void Settings_SSID_Or_Password(byte type)
       if (btn == BTN_SET)
       {
         setState++;
-        while (buttonPressed)
-          ;
+        while (buttonPressed) {
+          delay(50);
+        }
         lcd.clear();
         if (type == 0)
           LCD_PrintStringAtCursor("Set New SSID:   ", 0, 0);
@@ -246,8 +252,9 @@ void Settings_Recipient()
   strcpy(str, eep.recipientGMail);
 
   lcd.clear();
-  while (buttonPressed)
-    ;
+  while (buttonPressed) {
+    delay(50);
+  }
 
   LCD_PrintStringAtCursor("SET to Change   ", 0, 0);
   LCD_PrintStringAtCursor(str, 0, 1);
@@ -267,8 +274,9 @@ void Settings_Recipient()
       if (btn == BTN_SET)
       {
         setState++;
-        while (buttonPressed)
-          ;
+        while (buttonPressed) {
+          delay(50);
+        }
         lcd.clear();
         LCD_PrintStringAtCursor("Set Recipient :", 0, 0);
         strcpy(str, " ");
@@ -327,7 +335,7 @@ void Settings_Recipient()
   }
 }
 
-void Settings_MinimumADC()
+void Settings_WaterLevelMinimum()
 {
   unsigned int adcValue = 0;
   char strADC[5];
@@ -358,6 +366,91 @@ void Settings_MinimumADC()
   } while (button != BTN_MENU && setState);
 }
 
+void Settings_WaterLevelMaximum()
+{
+  unsigned int adcValue = 0;
+  char strADC[5];
+  bool setState = true;
+  unsigned char button = 0;
+  lcd.setCursor(0, 1);
+  lcd.print(" SET to Confirm ");
+  do
+  {
+    button = BUTTON;
+    adcValue = ADC_GetWaterLevelValue();
+    General_IntegerToString(adcValue, strADC, 4);
+    lcd.home();
+    lcd.print("Max. ADC :  ");
+    lcd.print(strADC);
+    if (button == BTN_SET)
+    {
+      setState = false;
+      EEPROM_Set_Maximum_Water_Level_ADC(adcValue);
+      lcd.setCursor(0, 1);
+      lcd.print("                ");
+      delay(300);
+      lcd.setCursor(0, 1);
+      lcd.print("Max. ADC is set ");
+      delay(2000);
+    }
+    delay(50);
+  } while (button != BTN_MENU && setState);
+}
+
+void Settings_WaterLevelLow()
+{
+  int lowValue = eep.lowWaterLevelADC;
+  char strLow[5];
+  bool setState = true;
+  unsigned char button = 0;
+  lcd.setCursor(0, 1);
+  lcd.print(" SET to Confirm ");
+  lcd.home();
+  lcd.print("Low Level:");
+  do
+  {
+    button = BUTTON;
+
+    General_IntegerToString(lowValue, strLow, 3);
+    lcd.setCursor(10, 0);
+    lcd.print(strLow);
+    lcd.print("%  ");
+
+    if (miliSecs300) {
+      lcd.setCursor(10, 0);
+      lcd.print("   ");
+      miliSecs300 = false;
+    }
+
+    if (button == BTN_UP)
+    {
+      if (++lowValue > 100)
+        lowValue = 0;
+    }
+    if (button == BTN_DOWN)
+    {
+      if (--lowValue < 0)
+        lowValue = 100;
+    }
+    if (button == BTN_SET)
+    {
+      setState = false;
+      EEPROM_Set_Low_Water_Level_ADC(lowValue);
+      lcd.setCursor(0, 1);
+      lcd.print("                ");
+      delay(300);
+      lcd.setCursor(0, 1);
+      lcd.print(" Low level set  ");
+      delay(2000);
+    }
+    if (buttonPressed) {
+      lcd.setCursor(10, 0);
+      lcd.print(strLow);
+      delay(100);
+    }
+  } while (button != BTN_MENU && setState);
+}
+
 void Settings_Time()
 {
   bool settingState = true;
@@ -380,7 +473,9 @@ void Settings_Time()
   General_IntegerToString(ss, &strTime[10], 2);
   strTime[16] = '\0';
   lcd.clear();
-  while (buttonPressed);
+  while (buttonPressed) {
+    delay(50);
+  }
   lcd.home();
   lcd.print("    HH:MM:SS    ");
   lcd.setCursor(0, 1);
@@ -405,7 +500,9 @@ void Settings_Time()
         }
         if (btn == BTN_SET)
         {
-          while (buttonPressed);
+          while (buttonPressed) {
+            delay(50);
+          }
           setState++;
         }
         if (counter > 5)
@@ -427,7 +524,9 @@ void Settings_Time()
         }
         if (btn == BTN_SET)
         {
-          while (buttonPressed);
+          while (buttonPressed) {
+            delay(50);
+          }
           setState++;
         }
         if (counter > 5)
@@ -454,7 +553,9 @@ void Settings_Time()
         }
         if (btn == BTN_SET)
         {
-          while (buttonPressed);
+          while (buttonPressed) {
+            delay(50);
+          }
           settingState = false;
           lcd.clear();
           RTC.setTime(hh, mm, ss);
@@ -501,7 +602,9 @@ void Settings_Pump_Duration(byte type)
   General_IntegerToString(ss, &strTime[14], 2);
   strTime[16] = '\0';
   lcd.clear();
-  while (buttonPressed);
+  while (buttonPressed) {
+    delay(50);
+  }
   lcd.home();
 
   switch (type)
@@ -543,8 +646,9 @@ void Settings_Pump_Duration(byte type)
         }
         if (btn == BTN_SET)
         {
-          while (buttonPressed)
-            ;
+          while (buttonPressed) {
+            delay(50);
+          }
           setState++;
         }
         if (counter > 5)
@@ -571,7 +675,9 @@ void Settings_Pump_Duration(byte type)
         }
         if (btn == BTN_SET)
         {
-          while (buttonPressed);
+          while (buttonPressed) {
+            delay(50);
+          }
           settingState = false;
           EEPROM_Set_Pump_Duration(type, (unsigned int)((mm * 60) + ss));
           lcd.setCursor(0, 1);

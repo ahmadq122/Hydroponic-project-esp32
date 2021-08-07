@@ -8,6 +8,7 @@
 #include <Arduino.h>
 //Library wajib ketika menggunakan komunikasi I2C
 #include <DS1307RTC.h>
+
 #include <Wire.h>
 //library modul LCD + I2C
 #include <LiquidCrystal_I2C.h>
@@ -25,6 +26,7 @@
 #define BTN_DOWN_PIN    34
 #define BTN_MENU_PIN    19
 #define BTN_SET_PIN     18
+
 #define BTN_UP          0x01
 #define BTN_DOWN        0x02
 #define BTN_MENU        0x04
@@ -60,8 +62,8 @@
 ////////////////////////////
 //EMAIL
 #define GMAIL_SMTP_SEVER    "smtp.gmail.com"
-#define GMAIL_SMTP_USERNAME "espnodemcu32@gmail.com"
-#define GMAIL_SMTP_PASSWORD "32espnodemcu"
+#define GMAIL_SMTP_USERNAME "aeroponik12@gmail.com"
+#define GMAIL_SMTP_PASSWORD "gunawan12"
 #define GMAIL_SMTP_PORT     465
 //////////////
 #define CONNECTED 0xAA
@@ -79,9 +81,11 @@ struct eeprom {
   char ssid[17];
   char password[17];
   char recipientGMail[17];
-  byte modeOperation;
+  uint8_t modeOperation;
   float phLow[2];
   float phNom[2];
+  unsigned int maximumWaterLevelADC;
+  uint8_t lowWaterLevelADC;
 };
 
 //Global variable untuk menyimpan data RTC dalam bentuk string
@@ -95,7 +99,9 @@ byte modeOperation  = MANUAL;
 uint16_t adcValue[2] = {0, 0};
 float phAdjustCalib = 0.0;
 ////////////////////
+bool miliSecs300 = false;
 bool secondTriggered = false;
+bool refreshTime = true;
 bool     blinkSeconds = false;
 bool     blink2Seconds = false;
 bool     wifiCheckState = false;
@@ -140,6 +146,7 @@ void Task_EvenSerialReceive( void *pvParameters );
 void Task_EvenSendEmail( void *pvParameters );
 void Task_EvenEvery5Seconds( void *pvParameters );
 void Task_ReadRtcEverySecond( void *pvParameters );
+void Task_EvenEvery300MiliSeconds( void *pvParameters);
 ///////////////
 bool bluetoothConnected = false;
 /////////////////
@@ -211,14 +218,18 @@ void loop() {
           Setting_StatePump(ON);
           Serial_SendRefreshActual();
         }
-        while (buttonPressed);
+        while (buttonPressed) {
+          delay(50);
+        }
         break;
       case BTN_DOWN:
         if (modeOperation == MANUAL) {
           Setting_StatePump(OFF);
           Serial_SendRefreshActual();
         }
-        while (buttonPressed);
+        while (buttonPressed) {
+          delay(50);
+        }
         break;
       case BTN_SET:
         modeOperation = modeOperation == MANUAL ? AUTO : MANUAL;
@@ -226,13 +237,17 @@ void loop() {
           EEPROM_Set_Mode_Operation(modeOperation);
           Serial_SendRefreshSetting();
         }
-        while (buttonPressed);
+        while (buttonPressed) {
+          delay(50);
+        }
         break;
       case BTN_MENU:
         menuState = true;
         Menu_MenuDisplay();
         Serial_Flush();
-        while (buttonPressed);
+        while (buttonPressed) {
+          delay(50);
+        }
         menuState = false;
         break;
       default: break;
@@ -269,7 +284,7 @@ void homeScreenDisplay() {
   char stringRow1_1[17];
   char stringRow2_1[17];
 
-  if (secondTriggered) {
+  if (refreshTime) {
     RTC.read(rtc);
     sprintf(stringTime, "%02d:%02d", rtc.Hour, rtc.Minute);
 
@@ -277,8 +292,8 @@ void homeScreenDisplay() {
     if (blinkSeconds)
       stringTimeBlink[2] = ' ';
     stringTimeBlink[5] = '\0';
-    //    Serial.println(str);
-    secondTriggered = false;
+    //Serial.println(stringTimeBlink);
+    refreshTime = false;
   }
 
   sprintf(stringRow1_1, "WLevel %s %s", (systemSafe ? "OK " : "Low"), stringTimeBlink);
@@ -290,7 +305,7 @@ void homeScreenDisplay() {
   lcd.print(stringRow2_1);
 }
 
-/////////////////////PUSHBUTTON
+///////////////////PUSHBUTTON
 void initialPin() {
   pinMode(BTN_UP_PIN,   INPUT);
   pinMode(BTN_DOWN_PIN, INPUT);
@@ -345,4 +360,14 @@ void checkPumpSchedule() {
       countDownPumpDuration = eep.pumpDurationMinute[SET_NIGHT_OFF] * 60 + eep.pumpDurationSecond[SET_NIGHT_OFF];
   }
   setDurationState = false;
+}
+
+uint8_t getPercentageOfWaterLevel() {
+  int percent = 0;
+  int totalAdcInRange = 0;
+  totalAdcInRange = eep.maximumWaterLevelADC - eep.minimumWaterLevelADC;
+  totalAdcInRange = totalAdcInRange <= 0 ? 0 : totalAdcInRange;
+  percent = (ADC_GetWaterLevelValue() - eep.minimumWaterLevelADC) / totalAdcInRange;
+  percent = constrain(percent, 0, 100);
+  return static_cast<uint8_t>(percent);
 }

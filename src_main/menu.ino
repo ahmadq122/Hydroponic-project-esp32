@@ -4,7 +4,7 @@
 
 void Menu_MenuDisplay() {
   String mainMenu [6] = {
-    "SET MINIMUM ADC",
+    "SET SENS. LEVEL",
     "SET PH CALIB.  ",
     "SET MODE       ",
     "SET TIME       ",
@@ -14,12 +14,27 @@ void Menu_MenuDisplay() {
   byte option = 0;
   do {
     option = Menu_GetSelectedMenu (mainMenu, 6, option);
-    if (option == 0)Settings_MinimumADC();
+    if (option == 0)Menu_SensorLevel();
     else if (option == 1)Setting_SetPhAdjustCalib();
     else if (option == 2)Menu_Set_Mode();
     else if (option == 3)Settings_Time();
     else if (option == 4)Menu_Set_WIFI();
     else if (option == 5)Menu_Set_GMAIL();
+  } while (option != MENU_EXIT);
+}
+
+void Menu_SensorLevel() {
+  String setLevelPointMenu[3] {
+    "SET MINIMUM PT.",
+    "SET MAXIMUM PT.",
+    "SET LOW LEVEL  "
+  };
+  byte option = 0;
+  do {
+    option = Menu_GetSelectedMenu (setLevelPointMenu, 3, option);
+    if (option == 0)Settings_WaterLevelMinimum();//Settings_SSID_Or_Password(0);
+    else if (option == 1)Settings_WaterLevelMaximum();
+    else if (option == 2)Settings_WaterLevelLow();
   } while (option != MENU_EXIT);
 }
 
