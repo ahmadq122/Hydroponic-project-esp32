@@ -1,5 +1,5 @@
 bool Email_Send_Notification() {
-  Serial.println("Email_Send_Notification()");
+  //  Serial.println("Email_Send_Notification()");
   if (systemSafe && counterTimerInterrupt2 > 0)
     counterTimerInterrupt2 = 0;
   if (!systemSafe && !counterTimerInterrupt2) {
@@ -44,33 +44,6 @@ String Email_Send(char *subject, char *sender, char *body, char *recipient, bool
   smtp.setSubject(subject);
   smtp.setMessage(body, htmlFormat);
   smtp.addRecipient(recipient);
-  //  smtp.addRecipient(recipient2);
-  if (!MailClient.sendMail(smtp))
-    return MailClient.smtpErrorReason();
-
-  return "";
-}
-
-String Email_Send2(char *subject, char *sender, char *body, char *recipient1, char *recipient2, boolean htmlFormat) {
-  smtp.setLogin(GMAIL_SMTP_SEVER, GMAIL_SMTP_PORT, GMAIL_SMTP_USERNAME, GMAIL_SMTP_PASSWORD);
-  smtp.setSender(sender, GMAIL_SMTP_USERNAME);
-  smtp.setSubject(subject);
-  smtp.setMessage(body, htmlFormat);
-  smtp.addRecipient(recipient1);
-  smtp.addRecipient(recipient2);
-  if (!MailClient.sendMail(smtp))
-    return MailClient.smtpErrorReason();
-
-  return "";
-}
-String Email_Send3(char *subject, char *sender, char *body, char *recipient1, char *recipient2, char *recipient3, boolean htmlFormat) {
-  smtp.setLogin(GMAIL_SMTP_SEVER, GMAIL_SMTP_PORT, GMAIL_SMTP_USERNAME, GMAIL_SMTP_PASSWORD);
-  smtp.setSender(sender, GMAIL_SMTP_USERNAME);
-  smtp.setSubject(subject);
-  smtp.setMessage(body, htmlFormat);
-  smtp.addRecipient(recipient1);
-  smtp.addRecipient(recipient2);
-  smtp.addRecipient(recipient3);
   if (!MailClient.sendMail(smtp))
     return MailClient.smtpErrorReason();
 

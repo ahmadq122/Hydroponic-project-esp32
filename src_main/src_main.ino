@@ -108,7 +108,7 @@ uint8_t counterBluetooth = Bluetooth_TimeOut;
 /////////Wifi
 char ssid[17]           = "my12IPhone";
 char password[17]       = "password";
-char recipientGMail[17] = "ahmadqodri122";
+char recipientGMail[17] = "gunawanpras02";
 byte wifiConnection = 0xFF;
 bool wifiTimerCheckState = false;
 ///////////////////////
